@@ -60,13 +60,6 @@ function App() {
             value={taxRate}
             onChange={value => setTaxRate(parseFloat(value))}
           />
-          <LineItemsTable
-            lineItems={lineItems}
-            setLineItems={setLineItems}
-            addLineItem={addLineItem}
-            updateLineItem={updateLineItem}
-            removeLineItem={removeLineItem}
-          />
           <MonetaryDisplayField
             label="Subtotal"
             value={calculateSubTotal(lineItems)}
@@ -74,6 +67,13 @@ function App() {
           <MonetaryDisplayField
             label="Total"
             value={calculateTotal(calculateSubTotal(lineItems), taxRate)}
+          />
+          <LineItemsTable
+            lineItems={lineItems}
+            setLineItems={setLineItems}
+            addLineItem={addLineItem}
+            updateLineItem={updateLineItem}
+            removeLineItem={removeLineItem}
           />
         </EditorSection>
         <InlinePDF
