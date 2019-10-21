@@ -2,12 +2,12 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Live Demo
-
 ## Critical Assumptions
 - Design is not really responsive, time constraints.
 - Tested on latest Chrome
 
+## Live Demo
+[IronInvoice]](https://markgalloway.github.io/IronInvoice/)
 
 ## Available Scripts
 
