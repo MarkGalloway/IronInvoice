@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "0cf36a2fc07a82623e7c188c529fba57",
+    "revision": "9ced7245575957ecfba982114cb33847",
     "url": "/IronInvoice/index.html"
   },
   {
