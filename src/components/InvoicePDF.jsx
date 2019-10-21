@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Document,
-  Font,
   Image,
   Page,
   StyleSheet,
@@ -16,10 +15,6 @@ import {
   calculateTotal,
   parseValue,
 } from '../utils';
-
-// const hyphenationCallback = word => word;
-
-// Font.registerHyphenationCallback(hyphenationCallback);
 
 const styles = StyleSheet.create({
   Page: {

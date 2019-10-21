@@ -1,55 +1,48 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import MaterialTable from 'material-table';
 import TextField from '@material-ui/core/TextField';
-import InputAdornment from '@material-ui/core/InputAdornment';
 
-import InlinePDF from './views/InlinePDF';
-import {
-  calculateLineItemTotal,
-  parseValue,
-  calculateSubTotal,
-  calculateTotal,
-} from './utils';
+import InlinePDF from './components/InlinePDF';
+import LineItemsTable from './components/LineItemsTable';
+import MonetaryDisplayField from './components/MonetaryDisplayField';
+import PercentInput from './components/PercentInput';
+import { calculateSubTotal, calculateTotal, parseValue } from './utils';
 import { useDebounce } from './hooks';
 
-const TEST_DATA = [
+const SEED_DATA = [
   {
-    id: 654,
+    id: 1,
     description: 'Computer Programming',
     unitCost: 56,
     quantity: 35.8,
-  },
-  {
-    id: 655,
-    description: 'Massage',
-    unitCost: 75.5,
-    quantity: 1,
   },
 ];
 
 function App() {
   const [description, setDescription] = useState('For services rendered.');
   const [taxRate, setTaxRate] = useState(0.0);
-  const [lineItems, setLineItems] = useState(TEST_DATA);
+  const [lineItems, setLineItems] = useState(SEED_DATA);
 
   const debouncedDescription = useDebounce(description, 500);
   const debouncedTaxRate = useDebounce(taxRate, 500);
 
-  const lineItemColumns = [
-    { title: 'Description', field: 'description' },
-    { title: 'Unit Cost', field: 'unitCost', type: 'numeric' },
-    { title: 'Quantity', field: 'quantity', type: 'numeric' },
-    {
-      title: 'Total',
-      field: 'total',
-      type: 'numeric',
-      editable: 'never',
-      render: rowData => (
-        <span>{`$${calculateLineItemTotal(rowData).toFixed(2)}`}</span>
-      ),
-    },
-  ];
+  const addLineItem = newData => {
+    const newLineItem = {
+      id: Date.now(),
+      description: newData.description,
+      unitCost: parseValue(newData.unitCost),
+      quantity: parseValue(newData.quantity),
+    };
+    setLineItems([...lineItems, newLineItem]);
+  };
+
+  const updateLineItem = (id, updateData) =>
+    setLineItems(
+      lineItems.map(item => (item.id === id ? { ...updateData, id } : item)),
+    );
+
+  const removeLineItem = id =>
+    setLineItems(lineItems.filter(item => item.id !== id));
 
   return (
     <Main>
@@ -62,68 +55,25 @@ function App() {
             onChange={event => setDescription(event.target.value)}
             margin="normal"
           />
-          <TextField
+          <PercentInput
             label="Tax Rate"
-            type="number"
             value={taxRate}
-            onChange={event => setTaxRate(parseFloat(event.target.value))}
-            margin="normal"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">%</InputAdornment>
-              ),
-            }}
+            onChange={value => setTaxRate(parseFloat(value))}
           />
-          <MaterialTable
-            columns={lineItemColumns}
-            style={{ boxShadow: 'none', marginBottom: 0 }}
-            data={lineItems}
-            title="Line Items"
-            editable={{
-              onRowAdd: async newData => {
-                const newLineItem = {
-                  id: Date.now(),
-                  description: newData.description,
-                  unitCost: parseValue(newData.unitCost),
-                  quantity: parseValue(newData.quantity),
-                };
-                setLineItems([...lineItems, newLineItem]);
-              },
-              onRowUpdate: async (newData, oldData) => {
-                setLineItems(
-                  lineItems.map(item =>
-                    item.id === oldData.id
-                      ? { ...newData, id: oldData.id }
-                      : item,
-                  ),
-                );
-              },
-              onRowDelete: async oldData =>
-                setLineItems(lineItems.filter(item => item.id !== oldData.id)),
-            }}
+          <LineItemsTable
+            lineItems={lineItems}
+            setLineItems={setLineItems}
+            addLineItem={addLineItem}
+            updateLineItem={updateLineItem}
+            removeLineItem={removeLineItem}
           />
-          <TextField
+          <MonetaryDisplayField
             label="Subtotal"
-            value={calculateSubTotal(lineItems).toFixed(2)}
-            disabled
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">$</InputAdornment>
-              ),
-            }}
+            value={calculateSubTotal(lineItems)}
           />
-          <TextField
+          <MonetaryDisplayField
             label="Total"
-            value={calculateTotal(
-              calculateSubTotal(lineItems),
-              taxRate,
-            ).toFixed(2)}
-            disabled
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">$</InputAdornment>
-              ),
-            }}
+            value={calculateTotal(calculateSubTotal(lineItems), taxRate)}
           />
         </EditorSection>
         <InlinePDF
